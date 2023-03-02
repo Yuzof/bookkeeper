@@ -12,6 +12,7 @@ from bookkeeper.utils import read_tree
 cat_repo_sql = SQLiteRepository[Category]('123.db', Category)
 exp_repo_sql = SQLiteRepository[Expense]('123.db', Expense)
 
+cat_repo_sql.delete_all()
 
 cats = '''
 продукты
@@ -32,9 +33,9 @@ while True:
         break
     if not cmd:
         continue
-    if cmd == 'categories':
+    if cmd == 'cats':
         print(*cat_repo_sql.get_all(), sep='\n')
-    elif cmd == 'expanses':
+    elif cmd == 'exps':
         print(*exp_repo_sql.get_all(), sep='\n')
     elif cmd == 'delete expanse':
         print(*exp_repo_sql.get_all(), sep='\n')
@@ -46,48 +47,47 @@ while True:
         cmd1 = int(input('введите id записи для удаления $> '))
         cat_repo_sql.delete(cmd1)
     
-    elif cmd == 'about category':
+    elif cmd == 'about cat':
         print(*cat_repo_sql.get_all(), sep='\n')
         cmd1 = int(input('введите id записи для получения информации $> '))
         print(cat_repo_sql.get(cmd1))
 
-    elif cmd == 'about expanse':
+    elif cmd == 'about exp':
         print(*exp_repo_sql.get_all(), sep='\n')
         cmd1 = int(input('введите id записи для получения информации $> '))
         print(exp_repo_sql.get(cmd1))
 
-    elif cmd == 'update expanse':
+    elif cmd == 'update exp':
         print(*exp_repo_sql.get_all(), sep='\n')
         cmd1 = int(input('введите id записи для обновления $> '))
         print(exp_repo_sql.get(cmd1))
         cmd2 = input('введите новую запись $> ')
-        amount, name = cmd2.split()
+        amount, *name = cmd2.split(' ')
         try:
-            cat = cat_repo_sql.get_all({'name': name})[0]
-            print(cat)
+            cat = cat_repo_sql.get_all({'name': ' '.join(name)})[0]
         except IndexError:
             print(f'категория {name} не найдена')
             continue
-        exp = Expense(int(amount), cat[0])
-        exp_repo_sql.update(cmd1, exp)
+        exp = Expense(int(amount), cat.name, cmd1)
+        exp_repo_sql.update(exp)
 
-    elif cmd == 'update category':
+    elif cmd == 'update cat':
         print(*cat_repo_sql.get_all(), sep='\n')
         cmd1 = int(input('введите id записи для обновления $> '))
         print(cat_repo_sql.get(cmd1))
         cmd2 = input('введите новую запись $> ')
-        name, parent = cmd2.split()
-        cat = Category(name, parent)
-        cat_repo_sql.update(cmd1, cat)
+        *name, parent = cmd2.split()
+        if parent == 'None' or parent == 'none':
+            parent = None
+        cat = Category(' '.join(name), parent, cmd1)
+        cat_repo_sql.update(cat)
 
     elif cmd[0].isdecimal():
         amount, name = cmd.split(maxsplit=1)
         try:
             cat = cat_repo_sql.get_all({'name': name})[0]
-            print(cat)
         except IndexError:
             print(f'категория {name} не найдена')
             continue
-        exp = Expense(int(amount), cat[0])
+        exp = Expense(int(amount), cat.name)
         exp_repo_sql.add(exp)
-        print(exp)
