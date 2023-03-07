@@ -65,7 +65,8 @@ class SQLiteRepository(AbstractRepository[T]):
                 try:
                     cur.execute('PRAGMA foreign_keys = ON')
                     cur.execute(
-                        f'SELECT *, rowid FROM {self.table_name} WHERE ({names}) = ({values});'
+                        f'SELECT *, rowid FROM {self.table_name}' +
+                        f' WHERE ({names}) = ({values});'
                     )
                     records = cur.fetchall()
                     result = []
@@ -96,7 +97,8 @@ class SQLiteRepository(AbstractRepository[T]):
             cur = con.cursor()
             cur.execute('PRAGMA foreign_keys = ON')
             try:
-                cur.execute(f'SELECT *, rowid FROM {self.table_name} WHERE rowid = {pk}')
+                cur.execute(f'SELECT *, rowid FROM {self.table_name}' +
+                            f' WHERE rowid = {pk}')
                 records = cur.fetchall()
                 result = self.cls(*records[0])  # unpack List[Tuple]
             except sqlite3.OperationalError as exc:
@@ -117,7 +119,8 @@ class SQLiteRepository(AbstractRepository[T]):
             values = [getattr(obj, x) for x in self.fields]
             try:
                 cur.execute(
-                    f'UPDATE {self.table_name} SET ({names}) = ({filler}) WHERE rowid = {obj.pk}',
+                    f'UPDATE {self.table_name} SET ({names}) = ({filler})' +
+                    f'WHERE rowid = {obj.pk}',
                     values
                 )
             except sqlite3.OperationalError as exc:
