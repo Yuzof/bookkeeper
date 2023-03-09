@@ -13,6 +13,7 @@ cat_repo_sql = SQLiteRepository[Category]('123.db', Category)
 exp_repo_sql = SQLiteRepository[Expense]('123.db', Expense)
 
 cat_repo_sql.delete_all()
+exp_repo_sql.delete_all()
 
 cats = '''
 продукты
