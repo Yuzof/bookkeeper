@@ -162,3 +162,4 @@ cython_debug/
 # Pearsonal files
 test.py
 *.db
+/gui
