@@ -1,4 +1,4 @@
-from bookkeeper.view.MainWidget import MainWidget
+from bookkeeper.view.main_widget import MainWidget
 from bookkeeper.models.expense import Expense
 from bookkeeper.models.category import Category
 from bookkeeper.models.budget import Budget

@@ -1,9 +1,17 @@
+"""
+UADC Table stands for UpdateAddDeleteChange Table.
+"""
+
 from PySide6 import QtWidgets
 from PySide6.QtCore import QDateTime
+from bookkeeper.repository.abstract_repository import AbstractRepository
 
 
 class UADCTable(QtWidgets.QWidget):
-    def __init__(self, repo, tablename : str, *args, **kwargs) -> None:
+    """
+    UADC TABLE
+    """
+    def __init__(self, repo: AbstractRepository, tablename: str, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.repo = repo
         self.layout = QtWidgets.QGridLayout()
@@ -29,11 +37,18 @@ class UADCTable(QtWidgets.QWidget):
         self.exp_tabl = QtWidgets.QTableWidget(20, len(self.repo.fields) + 1)
         for i, element in enumerate(self.repo.names.split(',')):
             self.exp_tabl.setHorizontalHeaderItem(i, QtWidgets.QTableWidgetItem(element))
-        self.exp_tabl.setHorizontalHeaderItem(len(self.repo.fields), QtWidgets.QTableWidgetItem('PK'))
+        self.exp_tabl.setHorizontalHeaderItem(len(self.repo.fields),
+                                              QtWidgets.QTableWidgetItem('PK'))
         self.layout.addWidget(self.exp_tabl, 1, 0, 1, 50)
         self.setLayout(self.layout)
 
-    def refresh_click(self):
+        self.dlg = QtWidgets.QDialog()
+        self.dlg_widgets = []
+
+    def refresh_click(self) -> None:
+        """
+        refresh
+        """
         result = self.repo.get_all()
         to_table = []
         for element in result:
@@ -42,86 +57,11 @@ class UADCTable(QtWidgets.QWidget):
             to_table.append(values)
         self.exp_tabl.clearContents()
         self.add_data(to_table)
-    
-    def add_menu(self):
-        self.dlg = QtWidgets.QDialog()
-        layout = QtWidgets.QGridLayout()
-        self.dlg_widgets = []
-        for i, element in enumerate(self.repo.fields):
-            if element == 'category':
-                self.dlg_widgets.append(QtWidgets.QComboBox())
-                self.dlg_widgets[-1].addItem('книги')
-                self.dlg_widgets[-1].addItem('мясо')
-                self.dlg_widgets[-1].addItem('одежда')
-                self.dlg_widgets[-1].addItem('сырое мясо')
-                self.dlg_widgets[-1].addItem('сладости')
-            elif 'date' in element:
-                self.dlg_widgets.append(QtWidgets.QDateTimeEdit())
-                self.dlg_widgets[-1].setDateTime(QDateTime.currentDateTime())
-            else:
-                self.dlg_widgets.append(QtWidgets.QLineEdit())  
-            layout.addWidget(QtWidgets.QLabel(str(element)), i, 0)
-            layout.addWidget(self.dlg_widgets[-1], i, 1)
-        add = QtWidgets.QPushButton('Добавить')
-        cancel = QtWidgets.QPushButton('Отменить')
-        cancel.clicked.connect(self.cancel)
-        add.clicked.connect(self.add_click)
-        layout.addWidget(add, len(self.repo.fields)+1, 0)
-        layout.addWidget(cancel, len(self.repo.fields)+1, 1)
-        self.dlg.setLayout(layout)
-        self.dlg.setWindowTitle('Добавить покупку')
-        self.dlg.exec()
 
-    def cancel(self):
-        self.dlg.close()
-
-    def add_click(self):
-        to_table = []
-        for element in self.dlg_widgets:
-            if isinstance(element, QtWidgets.QDateTimeEdit):
-                try:
-                    to_table.append(element.dateTime().toPython())
-                except AttributeError as e:
-                    print(e)
-            else:
-                try:
-                    to_table.append(int(element.text()))
-                except AttributeError:
-                    to_table.append(element.currentText())
-                except ValueError:
-                    to_table.append(element.text())
-        self.repo.add(self.repo.cls(*to_table))
-        self.refresh_click()
-        self.dlg.close()
-
-    def del_menu(self):
-        self.dlg = QtWidgets.QDialog()
-        self.dlg_widgets = []
-        layout = QtWidgets.QGridLayout()
-        self.dlg_widgets.append(QtWidgets.QLabel())
-        layout.addWidget(self.dlg_widgets[-1], 0, 0)
-        self.dlg_widgets.append(QtWidgets.QLineEdit())
-        layout.addWidget(self.dlg_widgets[-1], 0, 1)
-        add = QtWidgets.QPushButton('Применить')
-        cancel = QtWidgets.QPushButton('Отменить')
-        cancel.clicked.connect(self.cancel)
-        add.clicked.connect(self.del_click)
-        layout.addWidget(add, 1, 0)
-        layout.addWidget(cancel, 1, 1)
-        self.dlg.setLayout(layout)
-        self.dlg.setWindowTitle('Удалить запись')
-        self.dlg.exec()
-
-    def del_click(self):
-        try:
-            self.repo.delete(int(self.dlg_widgets[-1].text()))
-        except:
-            pass # :)
-        finally:
-            self.refresh_click()
-            self.dlg.close()
-
-    def upd_menu(self):
+    def add_menu(self) -> None:
+        """
+        refresh
+        """
         self.dlg = QtWidgets.QDialog()
         layout = QtWidgets.QGridLayout()
         self.dlg_widgets = []
@@ -140,20 +80,26 @@ class UADCTable(QtWidgets.QWidget):
                 self.dlg_widgets.append(QtWidgets.QLineEdit())
             layout.addWidget(QtWidgets.QLabel(str(element)), i, 0)
             layout.addWidget(self.dlg_widgets[-1], i, 1)
-        self.dlg_widgets.append(QtWidgets.QLineEdit()) 
-        layout.addWidget(QtWidgets.QLabel('PK'), len(self.repo.fields), 0)
-        layout.addWidget(self.dlg_widgets[-1], len(self.repo.fields), 1)
-        add = QtWidgets.QPushButton('Исправить')
+        add = QtWidgets.QPushButton('Добавить')
         cancel = QtWidgets.QPushButton('Отменить')
         cancel.clicked.connect(self.cancel)
-        add.clicked.connect(self.upd_click)
+        add.clicked.connect(self.add_click)
         layout.addWidget(add, len(self.repo.fields)+1, 0)
         layout.addWidget(cancel, len(self.repo.fields)+1, 1)
         self.dlg.setLayout(layout)
-        self.dlg.setWindowTitle('Исправить запись')
+        self.dlg.setWindowTitle('Добавить покупку')
         self.dlg.exec()
 
-    def upd_click(self):
+    def cancel(self) -> None:
+        """
+        refresh
+        """
+        self.dlg.close()
+
+    def add_click(self) -> None:
+        """
+        refresh
+        """
         to_table = []
         for element in self.dlg_widgets:
             if isinstance(element, QtWidgets.QDateTimeEdit):
@@ -168,6 +114,97 @@ class UADCTable(QtWidgets.QWidget):
                     to_table.append(element.currentText())
                 except ValueError:
                     to_table.append(element.text())
+        self.repo.add(self.repo.cls(*to_table))
+        self.refresh_click()
+        self.dlg.close()
+
+    def del_menu(self) -> None:
+        """
+        refresh
+        """
+        self.dlg = QtWidgets.QDialog()
+        self.dlg_widgets = []
+        layout = QtWidgets.QGridLayout()
+        self.dlg_widgets.append(QtWidgets.QLabel())
+        layout.addWidget(self.dlg_widgets[-1], 0, 0)
+        self.dlg_widgets.append(QtWidgets.QLineEdit())
+        layout.addWidget(self.dlg_widgets[-1], 0, 1)
+        add = QtWidgets.QPushButton('Применить')
+        cancel = QtWidgets.QPushButton('Отменить')
+        cancel.clicked.connect(self.cancel)
+        add.clicked.connect(self.del_click)
+        layout.addWidget(add, 1, 0)
+        layout.addWidget(cancel, 1, 1)
+        self.dlg.setLayout(layout)
+        self.dlg.setWindowTitle('Удалить запись')
+        self.dlg.exec()
+
+    def del_click(self) -> None:
+        """
+        refresh
+        """
+        try:
+            self.repo.delete(int(self.dlg_widgets[-1].text()))
+        except Exception as err:
+            print('Unable to delete object')
+            print(err)
+        finally:
+            self.refresh_click()
+            self.dlg.close()
+
+    def upd_menu(self) -> None:
+        """
+        refresh
+        """
+        self.dlg = QtWidgets.QDialog()
+        layout = QtWidgets.QGridLayout()
+        self.dlg_widgets = []
+        for i, element in enumerate(self.repo.fields):
+            if element == 'category':
+                self.dlg_widgets.append(QtWidgets.QComboBox())
+                self.dlg_widgets[-1].addItem('книги')
+                self.dlg_widgets[-1].addItem('мясо')
+                self.dlg_widgets[-1].addItem('одежда')
+                self.dlg_widgets[-1].addItem('сырое мясо')
+                self.dlg_widgets[-1].addItem('сладости')
+            elif 'date' in element:
+                self.dlg_widgets.append(QtWidgets.QDateTimeEdit())
+                self.dlg_widgets[-1].setDateTime(QDateTime.currentDateTime())
+            else:
+                self.dlg_widgets.append(QtWidgets.QLineEdit())
+            layout.addWidget(QtWidgets.QLabel(str(element)), i, 0)
+            layout.addWidget(self.dlg_widgets[-1], i, 1)
+        self.dlg_widgets.append(QtWidgets.QLineEdit())
+        layout.addWidget(QtWidgets.QLabel('PK'), len(self.repo.fields), 0)
+        layout.addWidget(self.dlg_widgets[-1], len(self.repo.fields), 1)
+        add = QtWidgets.QPushButton('Исправить')
+        cancel = QtWidgets.QPushButton('Отменить')
+        cancel.clicked.connect(self.cancel)
+        add.clicked.connect(self.upd_click)
+        layout.addWidget(add, len(self.repo.fields)+1, 0)
+        layout.addWidget(cancel, len(self.repo.fields)+1, 1)
+        self.dlg.setLayout(layout)
+        self.dlg.setWindowTitle('Исправить запись')
+        self.dlg.exec()
+
+    def upd_click(self) -> None:
+        """
+        refresh
+        """
+        to_table = []
+        for element in self.dlg_widgets:
+            if isinstance(element, QtWidgets.QDateTimeEdit):
+                try:
+                    to_table.append(element.dateTime().toPython())
+                except AttributeError as err:
+                    print(err)
+            else:
+                try:
+                    to_table.append(int(element.text()))
+                except AttributeError:
+                    to_table.append(element.currentText())
+                except ValueError:
+                    to_table.append(element.text())
         tmp = self.repo.cls(*to_table)
         print(to_table)
         print(tmp)
@@ -175,10 +212,13 @@ class UADCTable(QtWidgets.QWidget):
         self.refresh_click()
         self.dlg.close()
 
-    def add_data(self, data):
-        for i, row in enumerate(data):
-            for j, x in enumerate(row):
+    def add_data(self, data: list) -> None:
+        """
+        refresh
+        """
+        for inum, row in enumerate(data):
+            for jnum, x in enumerate(row):
                 self.exp_tabl.setItem(
-                    i, j,
+                    inum, jnum,
                     QtWidgets.QTableWidgetItem(str(x))
                 )
