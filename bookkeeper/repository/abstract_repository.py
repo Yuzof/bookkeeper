@@ -9,6 +9,7 @@
 
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar, Protocol, Any
+from inspect import get_annotations
 
 
 class Model(Protocol):  # pylint: disable=too-few-public-methods
@@ -31,6 +32,8 @@ class AbstractRepository(ABC, Generic[T]):
     update
     delete
     """
+    cls: type
+    fields: dict[str, Any]
 
     @abstractmethod
     def add(self, obj: T) -> int:

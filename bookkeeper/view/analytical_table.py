@@ -1,5 +1,6 @@
 """
 Analytical Table
+It's a modular widget for the home screen in the bookkeeper application
 """
 from PySide6 import QtWidgets
 from bookkeeper.view.uadc_table import UADCTable

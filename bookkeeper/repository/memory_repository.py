@@ -4,7 +4,7 @@
 
 from itertools import count
 from typing import Any
-
+from inspect import get_annotations
 from bookkeeper.repository.abstract_repository import AbstractRepository, T
 
 
@@ -13,9 +13,11 @@ class MemoryRepository(AbstractRepository[T]):
     Репозиторий, работающий в оперативной памяти. Хранит данные в словаре.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, cls: type) -> None:
         self._container: dict[int, T] = {}
         self._counter = count(1)
+        self.cls = cls
+        self.fields = get_annotations(cls, eval_str=True)
 
     def add(self, obj: T) -> int:
         if getattr(obj, 'pk', None) != 0:

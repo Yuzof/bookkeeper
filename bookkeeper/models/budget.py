@@ -21,24 +21,25 @@ class Budget: # pylint: disable=too-few-public-methods
     name: str = 'Период'
     begin_period_date: datetime = field(default_factory=datetime.now)
     end_period_date: datetime = field(default_factory=datetime.now)
-    value: float = 0
+    value: int = 0
     comment: str = ''
     pk: int = 0
 
-    def calculate(self, data: list[Expense]) -> float:
+    def calculate(self, data: list[Expense]) -> int:
         """
-        Function calculates all expanses for given period"""
-        tmp = 0.
+        Function calculates all expanses for given period.
+        """
+        tmp = 0
         for element in data:
             try:
                 if element.expense_date <= self.end_period_date and \
                    element.expense_date >= self.begin_period_date:
                     try:
-                        tmp += float(element.amount)
+                        tmp += int(element.amount)
                     except ValueError as err:
                         tmp += 0
                         print('Error with element:', element)
                         print(err)
             except AttributeError:
                 print('Не повезло, не фортануло')
-        return tmp
+        return int(tmp)

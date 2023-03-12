@@ -4,14 +4,15 @@ UADC Table stands for UpdateAddDeleteChange Table.
 
 from PySide6 import QtWidgets
 from PySide6.QtCore import QDateTime
-from bookkeeper.repository.abstract_repository import AbstractRepository
+from bookkeeper.repository.abstract_repository import AbstractRepository, T
 
 
-class UADCTable(QtWidgets.QWidget):
+class UADCTable(QtWidgets.QWidget): #  type: ignore
     """
-    UADC TABLE
+    UADC TABLE.
+    A simple table that implements the buttons of an abstract repository.
     """
-    def __init__(self, repo: AbstractRepository, tablename: str, *args, **kwargs) -> None:
+    def __init__(self, repo: AbstractRepository[T], tablename: str, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.repo = repo
         self.layout = QtWidgets.QGridLayout()
@@ -33,21 +34,24 @@ class UADCTable(QtWidgets.QWidget):
         self.upd_btn = QtWidgets.QPushButton('Исправить')
         self.upd_btn.clicked.connect(self.upd_menu)
         self.layout.addWidget(self.upd_btn, 0, 4, 1, 1)
-
-        self.exp_tabl = QtWidgets.QTableWidget(20, len(self.repo.fields) + 1)
-        for i, element in enumerate(self.repo.names.split(',')):
-            self.exp_tabl.setHorizontalHeaderItem(i, QtWidgets.QTableWidgetItem(element))
-        self.exp_tabl.setHorizontalHeaderItem(len(self.repo.fields),
-                                              QtWidgets.QTableWidgetItem('PK'))
-        self.layout.addWidget(self.exp_tabl, 1, 0, 1, 50)
-        self.setLayout(self.layout)
-
+        try:
+            self.exp_tabl = QtWidgets.QTableWidget(20, len(self.repo.fields) + 1)
+            names = ', '.join(self.repo.fields.keys())
+            for i, element in enumerate(names.split(',')):
+                self.exp_tabl.setHorizontalHeaderItem(i, QtWidgets.QTableWidgetItem(element))
+            self.exp_tabl.setHorizontalHeaderItem(len(self.repo.fields),
+                                                QtWidgets.QTableWidgetItem('PK'))
+            self.layout.addWidget(self.exp_tabl, 1, 0, 1, 50)
+            self.setLayout(self.layout)
+        except AttributeError as err:
+            print('Error parsing DB attributes, cannot contionue.', err)
         self.dlg = QtWidgets.QDialog()
         self.dlg_widgets = []
 
     def refresh_click(self) -> None:
         """
-        refresh
+        Action after pressing 'Обновить'. Makes get_all from repo and
+        refreshes the table.
         """
         result = self.repo.get_all()
         to_table = []
@@ -60,7 +64,8 @@ class UADCTable(QtWidgets.QWidget):
 
     def add_menu(self) -> None:
         """
-        refresh
+        Action after pressing 'Добавить'. Opens configuration menu to add
+        one more element to the repository.
         """
         self.dlg = QtWidgets.QDialog()
         layout = QtWidgets.QGridLayout()
@@ -92,13 +97,15 @@ class UADCTable(QtWidgets.QWidget):
 
     def cancel(self) -> None:
         """
-        refresh
+        Action after pressing 'Отменить' in additional
+        dialog boxes.
         """
         self.dlg.close()
 
     def add_click(self) -> None:
         """
-        refresh
+        Action after pressing 'Добавить' in the additional dialog window.
+        submitting the new element to the repository.
         """
         to_table = []
         for element in self.dlg_widgets:
@@ -120,7 +127,8 @@ class UADCTable(QtWidgets.QWidget):
 
     def del_menu(self) -> None:
         """
-        refresh
+        Action after pressing the 'Удалить' button.
+        Opens an additional comfiguration menu.
         """
         self.dlg = QtWidgets.QDialog()
         self.dlg_widgets = []
@@ -141,7 +149,9 @@ class UADCTable(QtWidgets.QWidget):
 
     def del_click(self) -> None:
         """
-        refresh
+        Action after pressing the 'Удалить' button in
+        additional configuration menu.
+        Deletes the element with given pk from the repository.
         """
         try:
             self.repo.delete(int(self.dlg_widgets[-1].text()))
@@ -154,7 +164,8 @@ class UADCTable(QtWidgets.QWidget):
 
     def upd_menu(self) -> None:
         """
-        refresh
+        Action after pressing 'Исправить' button.
+        Opens an additional configuration menu.
         """
         self.dlg = QtWidgets.QDialog()
         layout = QtWidgets.QGridLayout()
@@ -189,7 +200,9 @@ class UADCTable(QtWidgets.QWidget):
 
     def upd_click(self) -> None:
         """
-        refresh
+        Action after pressing 'Исправить' in the additional
+        configuration window. Submits the results to the
+        repository.
         """
         to_table = []
         for element in self.dlg_widgets:
@@ -214,7 +227,8 @@ class UADCTable(QtWidgets.QWidget):
 
     def add_data(self, data: list) -> None:
         """
-        refresh
+        Additional function to fill the table widget with
+        new elements.
         """
         for inum, row in enumerate(data):
             for jnum, x in enumerate(row):
