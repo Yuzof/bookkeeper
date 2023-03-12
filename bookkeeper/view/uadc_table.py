@@ -12,6 +12,9 @@ class UADCTable(QtWidgets.QWidget):  # type: ignore
     UADC TABLE.
     A simple table that implements the buttons of an abstract repository.
     """
+    # pylint: disable=too-many-instance-attributes
+    # All arguments are reasonable in this case.
+
     def __init__(self, repo: AbstractRepository[T],
                  tablename: str, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -78,11 +81,7 @@ class UADCTable(QtWidgets.QWidget):  # type: ignore
         for i, element in enumerate(self.repo.fields):
             if element == 'category':
                 self.dlg_widgets.append(QtWidgets.QComboBox())
-                self.dlg_widgets[-1].addItem('книги')
-                self.dlg_widgets[-1].addItem('мясо')
-                self.dlg_widgets[-1].addItem('одежда')
-                self.dlg_widgets[-1].addItem('сырое мясо')
-                self.dlg_widgets[-1].addItem('сладости')
+                self.set_categories()
             elif 'date' in element:
                 self.dlg_widgets.append(QtWidgets.QDateTimeEdit())
                 self.dlg_widgets[-1].setDateTime(QDateTime.currentDateTime())
@@ -97,8 +96,18 @@ class UADCTable(QtWidgets.QWidget):  # type: ignore
         layout.addWidget(add, len(self.repo.fields)+1, 0)
         layout.addWidget(cancel, len(self.repo.fields)+1, 1)
         self.dlg.setLayout(layout)
-        self.dlg.setWindowTitle('Добавить покупку')
+        self.dlg.setWindowTitle('Добавить запись')
         self.dlg.exec()
+
+    def set_categories(self) -> None:
+        """
+        Sets expanse categories, if they are.
+        """
+        self.dlg_widgets[-1].addItem('книги')
+        self.dlg_widgets[-1].addItem('мясо')
+        self.dlg_widgets[-1].addItem('одежда')
+        self.dlg_widgets[-1].addItem('сырое мясо')
+        self.dlg_widgets[-1].addItem('сладости')
 
     def cancel(self) -> None:
         """
@@ -138,7 +147,7 @@ class UADCTable(QtWidgets.QWidget):  # type: ignore
         self.dlg = QtWidgets.QDialog()
         self.dlg_widgets = []
         layout = QtWidgets.QGridLayout()
-        self.dlg_widgets.append(QtWidgets.QLabel())
+        self.dlg_widgets.append(QtWidgets.QLabel('PK'))
         layout.addWidget(self.dlg_widgets[-1], 0, 0)
         self.dlg_widgets.append(QtWidgets.QLineEdit())
         layout.addWidget(self.dlg_widgets[-1], 0, 1)
@@ -160,7 +169,7 @@ class UADCTable(QtWidgets.QWidget):  # type: ignore
         """
         try:
             self.repo.delete(int(self.dlg_widgets[-1].text()))
-        except Exception as err:
+        except AttributeError as err:
             print('Unable to delete object')
             print(err)
         finally:
