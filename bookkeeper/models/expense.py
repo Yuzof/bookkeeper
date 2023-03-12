@@ -7,7 +7,7 @@ from datetime import datetime
 
 
 @dataclass(slots=True)
-class Expense:
+class Expense: # pylint: disable=too-few-public-methods
     """
     Расходная операция.
     amount - сумма
