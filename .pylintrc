@@ -1,2 +1,4 @@
 [FORMAT]
 good-names=pk,i,x
+
+extension-pkg-whitelist=PySide6

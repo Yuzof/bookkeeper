@@ -8,7 +8,7 @@ from bookkeeper.models.budget import Budget
 from bookkeeper.models.expense import Expense
 
 
-class AnalyticalTable(QtWidgets.QWidget):
+class AnalyticalTable(QtWidgets.QWidget): # pylint: disable=too-few-public-methods
     """
     Brilliant analytical table
     """

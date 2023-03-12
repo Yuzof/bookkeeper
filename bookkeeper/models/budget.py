@@ -7,7 +7,7 @@ from bookkeeper.models.expense import Expense
 
 
 @dataclass(slots=True)
-class Budget:
+class Budget: # pylint: disable=too-few-public-methods
     """
     Бюджет (совокупность расходов за период времени).
     name - название периода

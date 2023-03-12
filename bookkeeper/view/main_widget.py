@@ -10,7 +10,7 @@ from bookkeeper.models.category import Category
 from bookkeeper.models.expense import Expense
 
 
-class MainWidget(QtWidgets.QWidget):
+class MainWidget(QtWidgets.QWidget): # pylint: disable=too-few-public-methods
     """
     Main Widget
     """
