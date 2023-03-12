@@ -40,6 +40,6 @@ class Budget:  # pylint: disable=too-few-public-methods
                         tmp += 0
                         print('Error with element:', element)
                         print(err)
-            except AttributeError:
-                print('Не повезло, не фортануло')
+            except AttributeError as err:
+                print('Не повезло, не фортануло \n', err)
         return int(tmp)

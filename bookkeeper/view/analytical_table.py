@@ -11,7 +11,8 @@ from bookkeeper.models.expense import Expense
 
 class AnalyticalTable(QtWidgets.QWidget):  # pylint: disable=too-few-public-methods
     """
-    Brilliant analytical table
+    Brilliant analytical table. Uses UADCTable, but some info
+    gets from another table.
     """
     def __init__(self, area_repo: AbstractRepository[Budget],
                  study_repo: AbstractRepository[Expense],
@@ -31,7 +32,7 @@ class AnalyticalTable(QtWidgets.QWidget):  # pylint: disable=too-few-public-meth
 
     def calc_budg(self) -> None:
         """
-        Norm function, kinda like it
+        Calculates the budget from another table.
         """
         data = self.study_repo.get_all()
         for period in self.area_repo.get_all():
