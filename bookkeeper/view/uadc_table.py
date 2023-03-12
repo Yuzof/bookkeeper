@@ -7,12 +7,13 @@ from PySide6.QtCore import QDateTime
 from bookkeeper.repository.abstract_repository import AbstractRepository, T
 
 
-class UADCTable(QtWidgets.QWidget): #  type: ignore
+class UADCTable(QtWidgets.QWidget):  # type: ignore
     """
     UADC TABLE.
     A simple table that implements the buttons of an abstract repository.
     """
-    def __init__(self, repo: AbstractRepository[T], tablename: str, *args, **kwargs) -> None:
+    def __init__(self, repo: AbstractRepository[T],
+                 tablename: str, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.repo = repo
         self.layout = QtWidgets.QGridLayout()
@@ -38,9 +39,13 @@ class UADCTable(QtWidgets.QWidget): #  type: ignore
             self.exp_tabl = QtWidgets.QTableWidget(20, len(self.repo.fields) + 1)
             names = ', '.join(self.repo.fields.keys())
             for i, element in enumerate(names.split(',')):
-                self.exp_tabl.setHorizontalHeaderItem(i, QtWidgets.QTableWidgetItem(element))
-            self.exp_tabl.setHorizontalHeaderItem(len(self.repo.fields),
-                                                QtWidgets.QTableWidgetItem('PK'))
+                self.exp_tabl.setHorizontalHeaderItem(
+                    i, QtWidgets.QTableWidgetItem(element)
+                )
+            self.exp_tabl.setHorizontalHeaderItem(
+                len(self.repo.fields),
+                QtWidgets.QTableWidgetItem('PK')
+            )
             self.layout.addWidget(self.exp_tabl, 1, 0, 1, 50)
             self.setLayout(self.layout)
         except AttributeError as err:
@@ -112,8 +117,8 @@ class UADCTable(QtWidgets.QWidget): #  type: ignore
             if isinstance(element, QtWidgets.QDateTimeEdit):
                 try:
                     to_table.append(element.dateTime().toPython())
-                except AttributeError as e:
-                    print(e)
+                except AttributeError as err:
+                    print(err)
             else:
                 try:
                     to_table.append(int(element.text()))

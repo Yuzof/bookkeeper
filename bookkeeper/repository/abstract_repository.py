@@ -9,7 +9,6 @@
 
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar, Protocol, Any
-from inspect import get_annotations
 
 
 class Model(Protocol):  # pylint: disable=too-few-public-methods

@@ -8,7 +8,7 @@ from bookkeeper.models.expense import Expense
 
 @pytest.fixture
 def repo():
-    return MemoryRepository()
+    return MemoryRepository(Expense)
 
 
 def test_create_with_full_args_list():

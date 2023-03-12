@@ -1,4 +1,5 @@
 from bookkeeper.repository.memory_repository import MemoryRepository
+from bookkeeper.models.expense import Expense
 
 import pytest
 
@@ -13,7 +14,7 @@ def custom_class():
 
 @pytest.fixture
 def repo():
-    return MemoryRepository()
+    return MemoryRepository(Expense)
 
 
 def test_crud(repo, custom_class):

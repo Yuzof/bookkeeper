@@ -11,7 +11,7 @@ from bookkeeper.repository.memory_repository import MemoryRepository
 
 @pytest.fixture
 def repo():
-    return MemoryRepository()
+    return MemoryRepository(Category)
 
 
 def test_create_object():
