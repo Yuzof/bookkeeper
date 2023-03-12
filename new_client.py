@@ -1,4 +1,4 @@
-from bookkeeper.view.MainWindow import MainWindow
+from bookkeeper.view.MainWidget import MainWidget
 from bookkeeper.models.expense import Expense
 from bookkeeper.models.category import Category
 from bookkeeper.models.budget import Budget
@@ -26,6 +26,6 @@ cats = '''
 Category.create_from_tree(read_tree(cats), cat_repo_sql)
 
 app = QtWidgets.QApplication(sys.argv)
-window = MainWindow(exp_repo_sql, cat_repo_sql, bud_repo_sql)
+window = MainWidget(exp_repo_sql, cat_repo_sql, bud_repo_sql)
 window.show()
 app.exec()
